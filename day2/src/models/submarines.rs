@@ -15,6 +15,12 @@ pub struct SubmarineV1 {
     pub depth: i32,
 }
 
+impl SubmarineV1 {
+    pub fn new() -> Self {
+        SubmarineV1 { xcord: 0, depth: 0 }
+    }
+}
+
 impl Submarine for SubmarineV1 {
     fn forward(self, unit: i32) -> Self {
         SubmarineV1 {
@@ -48,9 +54,19 @@ impl Submarine for SubmarineV1 {
 
 #[derive(Debug, Clone, Copy)]
 pub struct SubmarineV2 {
-    pub xcord: i32,
-    pub depth: i32,
-    pub aim: i32,
+    xcord: i32,
+    depth: i32,
+    aim: i32,
+}
+
+impl SubmarineV2 {
+    pub fn new() -> Self {
+        Self {
+            xcord: 0,
+            depth: 0,
+            aim: 0,
+        }
+    }
 }
 
 impl Submarine for SubmarineV2 {

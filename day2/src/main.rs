@@ -9,12 +9,8 @@ use std::path::Path;
 static INPUT_PATH: &str = "input.txt";
 
 fn main() -> Result<()> {
-    let submarine_v1 = SubmarineV1 { xcord: 0, depth: 0 };
-    let submarine_v2 = SubmarineV2 {
-        xcord: 0,
-        depth: 0,
-        aim: 0,
-    };
+    let submarine_v1 = SubmarineV1::new();
+    let submarine_v2 = SubmarineV2::new();
 
     let commands = read_commands(INPUT_PATH)?;
     let submarine_v1 = apply_commands(submarine_v1, &commands);
