@@ -8,9 +8,7 @@ const INPUT_PATH: &'static str = "./input.txt";
 
 fn main() -> Result<()> {
     let depths = read_depths(INPUT_PATH)?;
-    // First puzzle
     println!("First puzzle {0}", count_increases(&depths));
-    // Second puzzle
     let sliding_window_sums = calculate_sliding_window_sums(&depths, 3);
     println!("Second puzzle {0}", count_increases(&sliding_window_sums));
     Ok(())
