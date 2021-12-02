@@ -10,22 +10,32 @@ static INPUT_PATH: &str = "input.txt";
 
 fn main() -> Result<()> {
     // First puzzle
-    let submarine_v1 = SubmarineV1::new();
+    let submarine_v1 = SubmarineV1 { xcord: 0, depth: 0 };
+    let submarine_v2 = SubmarineV2 {
+        xcord: 0,
+        depth: 0,
+        aim: 0,
+    };
+
     let commands = read_commands(INPUT_PATH)?;
     let submarine_v1 = apply_commands(submarine_v1, &commands);
-    println!("First puzzle: {}", submarine_v1.position_x_depth());
-    // Second puzzle
-    let submarine_v2 = SubmarineV2::new();
     let submarine_v2 = apply_commands(submarine_v2, &commands);
+
+    println!("First puzzle: {}", submarine_v1.position_x_depth());
     println!("Second puzzle: {}", submarine_v2.position_x_depth());
     Ok(())
 }
 
-fn apply_commands(submarine: impl Submarine, commands: &[Command]) -> impl Submarine {
-    commands
-        .iter()
-        .copied()
-        .fold(submarine, |submarine, command| submarine.exec(command))
+fn apply_commands<T: Submarine>(submarine: T, commands: &[Command]) -> T {
+    commands.iter().copied().fold(submarine, move_submarine)
+}
+
+fn move_submarine<T: Submarine>(submarine: T, command: Command) -> T {
+    match command {
+        Command::Forward(unit) => submarine.forward(unit),
+        Command::Down(unit) => submarine.down(unit),
+        Command::Up(unit) => submarine.up(unit),
+    }
 }
 
 fn read_commands(file_path: &str) -> Result<Vec<Command>> {
