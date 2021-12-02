@@ -1,6 +1,7 @@
-# Advent of code 2021
 
 <div align="center">
+  
+  <h1>ADVENT OF CODE 2021</h1>
   
   <img src="./assets/christmas_tree.png">
   <p>
