@@ -19,13 +19,10 @@ fn main() -> Result<()> {
 }
 
 fn calculate_sliding_window_sums(depths: &[i32], size: usize) -> Vec<i32> {
-    let mut sums = vec![];
-    for i in 0..=depths.len() - size {
-        let window = &depths[i..i + size];
-        let sum = window.into_iter().fold(0, |a, &b| a + b);
-        sums.push(sum)
-    }
-    sums
+    (0..=depths.len() - size)
+        .map(|i| &depths[i..i + size])
+        .map(|slice| slice.iter().sum())
+        .collect()
 }
 
 fn count_increases(nums: &[i32]) -> i32 {
