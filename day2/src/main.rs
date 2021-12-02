@@ -9,7 +9,6 @@ use std::path::Path;
 static INPUT_PATH: &str = "input.txt";
 
 fn main() -> Result<()> {
-    // First puzzle
     let submarine_v1 = SubmarineV1 { xcord: 0, depth: 0 };
     let submarine_v2 = SubmarineV2 {
         xcord: 0,
