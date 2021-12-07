@@ -15,20 +15,19 @@ fn main() -> Result<()> {
 
 fn extract_report_rates(report: &[String]) -> [i32; 2] {
     let sums = compute_digits_sums(report);
-    let gamma_rate: String = sums
-        .iter()
-        .map(|&sum| if sum > 0 { "1" } else { "0" })
-        .collect::<Vec<&str>>()
-        .join("");
-    let epsilon_rate: String = sums
-        .iter()
-        .map(|&sum| if sum > 0 { "0" } else { "1" })
-        .collect::<Vec<&str>>()
-        .join("");
+    let gamma_rate: String = map_sums(&sums, |&sum| if sum > 0 { "1" } else { "0" }).join("");
+    let epsilon_rate: String = map_sums(&sums, |&sum| if sum > 0 { "0" } else { "1" }).join("");
     [
         binary_str_to_int(&gamma_rate),
         binary_str_to_int(&epsilon_rate),
     ]
+}
+
+fn map_sums<T, F>(sums: &[i32], f: F) -> Vec<T>
+where
+    F: FnMut(&i32) -> T,
+{
+    sums.iter().map(f).collect::<Vec<T>>()
 }
 
 fn compute_digits_sums(report: &[String]) -> Vec<i32> {
