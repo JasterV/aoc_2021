@@ -24,8 +24,8 @@ fn extract_report_rates(report: &[String]) -> [i32; 4] {
     let oxygen_rate = filter_report_while(
         report,
         |report, iteration| {
-            filter_report_by_nums_bit(report, iteration, |sum, c| {
-                sum >= 0 && c == '1' || sum < 0 && c == '0'
+            filter_report_by_nums_bit(report, iteration, |bit_sums, curr_bit| {
+                bit_sums >= 0 && curr_bit == '1' || bit_sums < 0 && curr_bit == '0'
             })
         },
         |report, iteration| report.len() == 1 || iteration > sums.len(),
@@ -36,8 +36,8 @@ fn extract_report_rates(report: &[String]) -> [i32; 4] {
 
     let co2_rate = filter_report_while(
         report,
-        |report, iteration| {
-            filter_report_by_nums_bit(report, iteration, |bit_sums, curr_bit| {
+        |report, bit_index| {
+            filter_report_by_nums_bit(report, bit_index, |bit_sums, curr_bit| {
                 bit_sums >= 0 && curr_bit == '0' || bit_sums < 0 && curr_bit == '1'
             })
         },
