@@ -23,7 +23,7 @@ impl Cell {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Board {
     cells: Vec<Cell>,
 }

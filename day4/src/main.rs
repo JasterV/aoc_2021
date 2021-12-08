@@ -9,7 +9,7 @@ static INPUT_PATH: &str = "input.txt";
 
 fn main() -> Result<()> {
     let (nums, boards) = read_game(INPUT_PATH)?;
-    let (last_num, winning_board) = play_game(&nums, boards);
+    let (last_num, winning_board) = play_game(&nums, &boards);
     let unmarked_cells_sum = winning_board
         .iter()
         .filter(|cell| !cell.is_marked())
@@ -30,10 +30,10 @@ fn read_game(filename: &str) -> Result<(Vec<u16>, Vec<Board>)> {
     Ok((nums_to_draw, boards))
 }
 
-fn play_game(nums: &[u16], boards: Vec<Board>) -> (u16, Board) {
+fn play_game(nums: &[u16], boards: &[Board]) -> (u16, Board) {
     let (last_num, boards) = nums
         .iter()
-        .fold_while((0, boards), |(last_num, boards), &num| {
+        .fold_while((0, Vec::from(boards)), |(last_num, boards), &num| {
             if boards.iter().any(|board| board.has_won()) {
                 return Done((last_num, boards));
             }
