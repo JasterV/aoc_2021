@@ -1,10 +1,10 @@
-pub const COLUMNS: usize = 4;
+pub const COLUMNS: usize = 5;
 pub const ROWS: usize = 5;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Cell {
-    Marked(u8),
-    UnMarked(u8),
+    Marked(u16),
+    UnMarked(u16),
 }
 
 impl Cell {
@@ -12,6 +12,13 @@ impl Cell {
         match self {
             Cell::Marked(_) => true,
             _ => false,
+        }
+    }
+
+    pub fn into_inner(&self) -> u16 {
+        match self {
+            Cell::Marked(num) => *num,
+            Cell::UnMarked(num) => *num,
         }
     }
 }
@@ -22,7 +29,7 @@ pub struct Board {
 }
 
 impl Board {
-    pub fn mark(&self, num: u8) -> Board {
+    pub fn mark(&self, num: u16) -> Board {
         let cells = self
             .cells
             .iter()
@@ -58,6 +65,10 @@ impl Board {
             .map(|col| self.get(row, col))
             .all(|cell| cell.map_or(false, |cell| cell.is_marked()))
     }
+
+    pub fn iter(&self) -> std::slice::Iter<'_, Cell> {
+        self.cells.iter()
+    }
 }
 
 impl From<&str> for Board {
@@ -68,5 +79,92 @@ impl From<&str> for Board {
             .map(Cell::UnMarked)
             .collect();
         Board { cells }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{Board, Cell};
+
+    const BOARD_STR: &'static str = r#"
+    14 21 17 24  4
+    10 16 15  9 19
+    18  8 23 26 20
+    22 11 13  6  5
+     2  0 12  3  7"#;
+
+    #[test]
+    fn creates_board_from_str() {
+        let nums: [u16; 25] = [
+            14, 21, 17, 24, 4, 10, 16, 15, 9, 19, 18, 8, 23, 26, 20, 22, 11, 13, 6, 5, 2, 0, 12, 3,
+            7,
+        ];
+        let expected_cells: Vec<Cell> = nums.iter().copied().map(Cell::UnMarked).collect();
+        let board = Board::from(BOARD_STR);
+        assert_eq!(expected_cells, board.cells);
+    }
+
+    #[test]
+    fn marks_cell() {
+        let num_to_mark = 14;
+        let nums: [u16; 25] = [
+            14, 21, 17, 24, 4, 10, 16, 15, 9, 19, 18, 8, 23, 26, 20, 22, 11, 13, 6, 5, 2, 0, 12, 3,
+            7,
+        ];
+        let board = Board::from(BOARD_STR).mark(num_to_mark);
+        let marked_cells: Vec<Cell> = board
+            .cells
+            .into_iter()
+            .filter(|cell| cell.is_marked())
+            .collect();
+        let expected_marked_cells: Vec<Cell> = nums
+            .iter()
+            .copied()
+            .filter(|&num| num == num_to_mark)
+            .map(Cell::Marked)
+            .collect();
+        assert_eq!(marked_cells, expected_marked_cells);
+    }
+
+    #[test]
+    fn gets_cell_by_row_and_column() {
+        let board = Board::from(BOARD_STR);
+        let cell_0_0 = board.get(0, 0);
+        let cell_5_5 = board.get(4, 4);
+        let cell_2_3 = board.get(2, 3);
+        assert_eq!(cell_0_0, Some(&Cell::UnMarked(14)));
+        assert_eq!(cell_5_5, Some(&Cell::UnMarked(7)));
+        assert_eq!(cell_2_3, Some(&Cell::UnMarked(26)));
+    }
+
+    #[test]
+    fn checks_if_row_is_marked() {
+        let first_row: [u16; 5] = [14, 21, 17, 24, 4];
+        let board = Board::from(BOARD_STR);
+        assert!(!board.has_won());
+        let board = first_row.iter().fold(board, |board, &num| board.mark(num));
+        assert!(board.has_won());
+    }
+
+    #[test]
+    fn checks_row_not_marked() {
+        let almost_first_row: [u16; 4] = [14, 21, 17, 24];
+        let board = Board::from(BOARD_STR);
+        assert!(!board.has_won());
+        let board = almost_first_row
+            .iter()
+            .fold(board, |board, &num| board.mark(num));
+        assert!(!board.has_won());
+    }
+
+    #[test]
+    fn checks_marked_column() {
+        let first_column: [u16; 5] = [14, 10, 18, 22, 2];
+        let board = Board::from(BOARD_STR);
+        assert!(!board.has_won());
+        let board = first_column
+            .iter()
+            .fold(board, |board, &num| board.mark(num));
+        assert!(board.has_won());
     }
 }
