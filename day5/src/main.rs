@@ -9,18 +9,21 @@ use std::{
 static INPUT_PATH: &str = "input.txt";
 
 fn main() -> Result<()> {
-    let overlapping_points_count = read_lines(INPUT_PATH)?
-        .filter_map(|line| line.ok().map(Line::from))
+    let overlapping_points_count = read_input(INPUT_PATH)?
         .flat_map(|line| line.get_points())
         .fold(HashMap::new(), |mut counters, point| {
             counters.insert(point, counters.get(&point).map_or(1, |count| count + 1));
             counters
         })
-        .values()
-        .filter(|&&count| count >= 2)
+        .into_values()
+        .filter(|&count| count >= 2)
         .count();
     println!("First puzzle: {}", overlapping_points_count);
     Ok(())
+}
+
+fn read_input(filename: &str) -> Result<impl Iterator<Item = Line>> {
+    Ok(read_lines(filename)?.filter_map(|line| line.ok().map(Line::from)))
 }
 
 // The output is wrapped in a Result to allow matching on errors
