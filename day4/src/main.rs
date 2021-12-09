@@ -1,6 +1,4 @@
 mod models;
-
-use itertools::{FoldWhile::*, Itertools};
 use models::Board;
 use std::fs;
 use std::io::Result;
@@ -9,13 +7,13 @@ static INPUT_PATH: &str = "input.txt";
 
 fn main() -> Result<()> {
     let (nums, boards) = read_game(INPUT_PATH)?;
-    let (last_num, winning_board) = play_game(&nums, &boards);
-    let unmarked_cells_sum = winning_board
-        .iter()
-        .filter(|cell| !cell.is_marked())
-        .map(|cell| cell.into_inner())
-        .sum::<u16>();
-    println!("First puzzle: {}", last_num * unmarked_cells_sum);
+    let winners = play_game(&nums, &boards);
+    // First puzzle
+    let (winning_num, winning_board) = winners.first().unwrap();
+    println!("First puzzle: {}", winning_num * winning_board.get_score());
+    // Second puzzle
+    let (looser_num, looser_board) = winners.last().unwrap();
+    println!("Second puzzle: {}", looser_num * looser_board.get_score());
     Ok(())
 }
 
@@ -30,16 +28,23 @@ fn read_game(filename: &str) -> Result<(Vec<u16>, Vec<Board>)> {
     Ok((nums_to_draw, boards))
 }
 
-fn play_game(nums: &[u16], boards: &[Board]) -> (u16, Board) {
-    let (last_num, boards) = nums
+fn play_game(nums: &[u16], boards: &[Board]) -> Vec<(u16, Board)> {
+    let (winning_boards, _) = nums
         .iter()
-        .fold_while((0, Vec::from(boards)), |(last_num, boards), &num| {
-            if boards.iter().any(|board| board.has_won()) {
-                return Done((last_num, boards));
-            }
-            Continue((num, boards.iter().map(|board| board.mark(num)).collect()))
-        })
-        .into_inner();
-    let winning_board = boards.into_iter().find(|board| board.has_won()).unwrap();
-    (last_num, winning_board)
+        // Reduce nums list to a tuple of (winner_boards, remaining_boards)
+        // On each iteration we add the new winners to the winner_boards list
+        // and remove them from the remaining_boards list
+        .fold((vec![], Vec::from(boards)), |(winners, remaining), &num| {
+            let remaining = remaining.iter().map(|board| board.mark(num));
+            let round_winners = remaining
+                .clone()
+                .filter(|board| board.has_won())
+                .map(|board| (num, board));
+            let non_winners = remaining.into_iter().filter(|board| !board.has_won());
+            (
+                winners.into_iter().chain(round_winners).collect(),
+                non_winners.collect(),
+            )
+        });
+    winning_boards
 }

@@ -42,6 +42,14 @@ impl Board {
         Board { cells }
     }
 
+    pub fn get_score(&self) -> u16 {
+        self.cells
+            .iter()
+            .filter(|cell| !cell.is_marked())
+            .map(|cell| cell.into_inner())
+            .sum::<u16>()
+    }
+
     pub fn has_won(&self) -> bool {
         (0..COLUMNS).any(|col| self.is_complete_column(col))
             || (0..ROWS).any(|row| self.is_complete_row(row))
@@ -64,10 +72,6 @@ impl Board {
         (0..COLUMNS)
             .map(|col| self.get(row, col))
             .all(|cell| cell.map_or(false, |cell| cell.is_marked()))
-    }
-
-    pub fn iter(&self) -> std::slice::Iter<'_, Cell> {
-        self.cells.iter()
     }
 }
 
