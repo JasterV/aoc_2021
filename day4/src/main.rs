@@ -7,7 +7,7 @@ static INPUT_PATH: &str = "input.txt";
 
 fn main() -> Result<()> {
     let (nums, boards) = read_game(INPUT_PATH)?;
-    let winners = play_game(&nums, &boards);
+    let (winners, _remaining) = play_game(&nums, &boards);
     // First puzzle
     let (winning_num, winning_board) = winners.first().unwrap();
     println!("First puzzle: {}", winning_num * winning_board.get_score());
@@ -28,10 +28,9 @@ fn read_game(filename: &str) -> Result<(Vec<u16>, Vec<Board>)> {
     Ok((nums_to_draw, boards))
 }
 
-fn play_game(nums: &[u16], boards: &[Board]) -> Vec<(u16, Board)> {
-    let (winning_boards, _) = nums
-        .iter()
-        // Reduce nums list to a tuple of (winner_boards, remaining_boards)
+fn play_game(nums: &[u16], boards: &[Board]) -> (Vec<(u16, Board)>, Vec<Board>) {
+    nums.iter()
+        // Reduce nums list to a vector of tuples => (winner_boards, remaining_boards)
         // On each iteration we add the new winners to the winner_boards list
         // and remove them from the remaining_boards list
         .fold((vec![], Vec::from(boards)), |(winners, remaining), &num| {
@@ -45,6 +44,5 @@ fn play_game(nums: &[u16], boards: &[Board]) -> Vec<(u16, Board)> {
                 winners.into_iter().chain(round_winners).collect(),
                 non_winners.collect(),
             )
-        });
-    winning_boards
+        })
 }
