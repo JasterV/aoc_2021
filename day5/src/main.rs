@@ -18,7 +18,7 @@ fn main() -> Result<()> {
         .into_values()
         .filter(|&count| count >= 2)
         .count();
-    println!("First puzzle: {}", overlapping_points_count);
+    println!("Overlapping points: {}", overlapping_points_count);
     Ok(())
 }
 
