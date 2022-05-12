@@ -26,7 +26,12 @@ fn optimal_alignment_position(positions: &[i32]) -> (i32, i32) {
 fn calculate_alignment_fuel_cost(align_to: i32, positions: &[i32]) -> i32 {
     positions
         .into_iter()
-        .map(|pos| i32::abs(align_to - pos))
+        // Get the distance between the 2 positions
+        .map(|pos| align_to - pos)
+        // Transform into absolute distance
+        .map(i32::abs)
+        // Calculate sum from 0 to n
+        .map(|n| n * (n + 1) / 2)
         .sum()
 }
 
